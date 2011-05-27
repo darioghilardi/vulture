@@ -1,0 +1,138 @@
+/* 
+    Document   : style
+    Created on : 18-mag-2009, 10.26.49
+    Author     : ingo
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+background: #fff url(images/bg.jpg) repeat-x;
+font-family: Arial, Helvetica, sans-serif;
+font-size: 12px;
+line-height: 18px;
+color: #333333;;
+}
+
+img { border: none; }
+a { color: #2E4A55; text-decoration: none; }
+a:hover { text-decoration: underline; color : #000; }
+
+#wrap {
+margin: 0 auto;
+width: 800px;
+}
+
+#header {
+height: 150px;
+}
+#header h1 {
+font-size: 30px;
+font-weight: 100;
+letter-spacing: -3px;
+padding: 55px 0 5px 0;
+}
+#header h1 a {
+color: #334436;
+text-decoration: none;
+}
+#header h1 a:hover {
+color: #555;
+text-decoration: none;
+}
+#header h2 {
+color: #555;
+font-size: 19px;
+font-weight: 100;
+padding: 0 0 0 0;
+letter-spacing: -1px;
+line-height: 12px;
+}
+
+#content {
+padding: 10px 0;
+}
+
+.left h2 {
+color: #FF4800;
+font-size: 22px;
+letter-spacing: -1px;
+font-weight: 100;
+padding-bottom : 15px;
+}
+
+.left {
+float: left;
+width: 200px;
+border-right: 1px solid #bbb;
+font-size: 14px;
+font-weight: 600;
+height: 500px;
+}
+
+.left ul {
+list-style-type: none;
+padding: 5px 10px 10px 10px;
+}
+
+.left h2 {
+height: 30px;
+font-size: 15px;
+color: #666;
+line-height: 30px;
+}
+
+.left a { text-decoration: none }
+
+.right {
+width: 640px;
+text-align: justify;
+padding-left: 215px;
+}
+
+.right h2 {
+  margin-bottom: 15px;
+}
+
+#footer {
+border-top: 1px solid #bbb;
+text-align: center;
+color: #333;
+font-size: 11px;
+padding: 0 0 10px 0;
+margin-top: 10px;
+}
+
+/* Styling lessons */
+.articles form {
+  margin: 20px 0 50px 0;
+}
+
+.articles #formtitle,
+.articles #formmessage {
+  width: 400px;
+  margin-bottom: 10px;
+}
+
+.messageboard {
+  border: 1px solid grey;
+}
+
+.messageboard tbody tr td {
+  text-align: center;
+  width: 200px;
+}
+
+.rightal {
+  text-align: right;
+}
