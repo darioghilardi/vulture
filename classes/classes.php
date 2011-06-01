@@ -19,8 +19,8 @@ You should have received a copy of the GNU General Public License along with thi
 	class VarDeclare
 	{
 		public $id;
-    	public $value;
-    	public $line;	
+    public $value;
+    public $line;	
 		public $marker;
 		public $dependencies;
 		

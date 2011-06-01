@@ -24,8 +24,8 @@ You should have received a copy of the GNU General Public License along with thi
 	include('config/sinks.php');			// sensitive sinks
 	include('config/info.php');				// interesting functions
 	
-	include('functions/tokens.php');		// prepare and fix token list
-	include('functions/scan.php');			// scan for sinks in token list
+	include('classes/tokens.php');		// prepare and fix token list
+	include('classes/scan.php');			// scan for sinks in token list
 	include('functions/output.php');		// output scan result
 	include('functions/search.php');		// search functions
 	
@@ -141,9 +141,13 @@ You should have received a copy of the GNU General Public License along with thi
 			{
 				$userfunction_secures = false;
 				$userfunction_taints = false;
-				$scanned_files[$file_name] = scan_file($file_name, $scan_functions, 
-				$T_FUNCTIONS, $T_ASSIGNMENT, $T_IGNORE, 
-				$T_INCLUDES, $T_XSS, $T_IGNORE_STRUCTURE, $F_INTEREST);
+        $scan = new scan($file_name, $scan_functions, $T_FUNCTIONS, $T_ASSIGNMENT, $T_IGNORE, $T_INCLUDES, $T_XSS, $T_IGNORE_STRUCTURE, $F_INTEREST);
+        $tokens = $scan->prepare_code();        
+				//$scanned_files[$file_name] = scan_file($file_name, $scan_functions, 
+				//$T_FUNCTIONS, $T_ASSIGNMENT, $T_IGNORE, 
+				//$T_INCLUDES, $T_XSS, $T_IGNORE_STRUCTURE, $F_INTEREST);
+        print_r($tokens);
+        die;
 			}
 			
 			// remove vulnerabilities in user-defined functions that have not been called

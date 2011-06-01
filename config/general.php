@@ -18,7 +18,8 @@ You should have received a copy of the GNU General Public License along with thi
 	ini_set('short_open_tag', 1);			// who knows if I use them ;)
 	ini_set('auto_detect_line_endings', 1);	// detect newlines in MAC files
 	set_time_limit(300);					// 5 minutes
-	error_reporting(E_ERROR | E_WARNING | E_PARSE);
+  error_reporting(E_ALL);
+	//error_reporting(E_ERROR | E_WARNING | E_PARSE);
 		
 	$version = '0.36';						// RIPS version to be displayed	
 	$maxtrace = 30;							// maximum of parameter traces per PVF find
