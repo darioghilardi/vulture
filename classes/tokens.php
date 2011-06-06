@@ -83,7 +83,6 @@ class token {
 		}
 		// return tokens with rearranged key index
     print_r($this->tokens);
-    die;
 		$this->tokens = array_values($this->tokens);
 	}
   
