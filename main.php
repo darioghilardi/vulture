@@ -15,10 +15,19 @@ You should have received a copy of the GNU General Public License along with thi
 
 **/
 
-	###############################  INCLUDES  ################################
+// xhprof profiler enabling tracking
+if (extension_loaded('xhprof')) {
+    include_once '/usr/share/php/PEAR/share/pear/xhprof_lib/utils/xhprof_lib.php';
+    include_once '/usr/share/php/PEAR/share/pear/xhprof_lib/utils/xhprof_runs.php';
+    xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
+}
 
-	include('config/general.php');			// general settings
-	include('config/sources.php');			// tainted variables and functions
+	###############################  INCLUDES  ################################
+  
+    include('classes/filedir.php');
+    include('config/general.php');			// general settings
+	
+    include('config/sources.php');			// tainted variables and functions
 	include('config/tokens.php');			// tokens for lexical analysis
 	include('config/securing.php');			// securing functions
 	include('config/sinks.php');			// sensitive sinks
@@ -32,36 +41,25 @@ You should have received a copy of the GNU General Public License along with thi
 	include('classes/classes.php'); 		// classes
 	
 	###############################  MAIN  ####################################
-	
+    
+    // Get the configuration instance
+    $conf = Config::getInstance();
+    
 	$start = microtime(TRUE);
 	
 	$output = array();
 	$info = array();
 	$scanned_files = array();
 	
-	if(!empty($_POST['loc']))
-	{		
-		$location = realpath($_POST['loc']);
-		
-		if(is_dir($location))
-		{
-			$scan_subdirs = isset($_POST['subdirs']) ? $_POST['subdirs'] : false;
-			$data = read_recursiv($location, $scan_subdirs);
-			
-			if(count($data) > $warnfiles && !isset($_POST['ignore_warning']))
-				die('warning:'.count($data));
-		}	
-		else if(is_file($location) && in_array(substr($location, strrpos($location, '.')), $filetypes))
-		{
-			$data[0] = $location;
-		}
-		else
-		{
-			$data = array();
-		}
+	if(!empty($_POST['loc'])) {
+        
+        $fileprocessing = new FileDir($_POST['loc'], $_POST['subdirs'], $_POST['ignore_warning']);
+        $fileprocessing->getFiles();
+        echo "<pre>".print_r($fileprocessing->files,1)."</pre>";
+    }
 	
 		// SCAN
-		if(empty($_POST['search']))
+/*		if(empty($_POST['search']))
 		{
 			$scan_functions = array();
 			$user_functions = array();
@@ -143,7 +141,7 @@ You should have received a copy of the GNU General Public License along with thi
 				$userfunction_taints = false;
         $scanobj = new scan($file_name, $scan_functions, $T_FUNCTIONS, $T_ASSIGNMENT, $T_IGNORE, $T_INCLUDES, $T_XSS, $T_IGNORE_STRUCTURE, $F_INTEREST);
         $scanobj->prepare_code();
-        $scanned_files[$file_name] = $scanobj->scan();
+        $scanned_files[$file_name] = $scanobj->scan_file();
 				//$scanned_files[$file_name] = scan_file($file_name, $scan_functions, 
 				//$T_FUNCTIONS, $T_ASSIGNMENT, $T_IGNORE, 
 				//$T_INCLUDES, $T_XSS, $T_IGNORE_STRUCTURE, $F_INTEREST);
@@ -348,5 +346,24 @@ You should have received a copy of the GNU General Public License along with thi
 
 <?php 
 	// scan result
-	@printoutput($output, $_POST['treestyle']); 
+	@printoutput($output, $_POST['treestyle']);
+ 
+*/
+    
+
+
+
+// xhprof profiler close tracking operations
+if (extension_loaded('xhprof')) {
+    $profiler_namespace = 'rips';  // namespace for your application
+    $xhprof_data = xhprof_disable();
+    print_r($xhprof_data);
+    $xhprof_runs = new XHProfRuns_Default();
+    $run_id = $xhprof_runs->save_run($xhprof_data, $profiler_namespace);
+ 
+    // url to the XHProf UI libraries (change the host name and path)
+    $profiler_url = sprintf('http://phpdev.local/xhprof/xhprof_html/index.php?run=%s&source=%s', $run_id, $profiler_namespace);
+    echo '<a style="color:#000;" href="'. $profiler_url .'" target="_blank">Profiler output</a>';
+}
+
 ?>

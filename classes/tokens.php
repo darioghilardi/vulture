@@ -74,7 +74,7 @@ class token {
    *  Some tokenchains need to be fixed to scan correctly later	
    */
 	function fix_tokens()
-	{	
+	{
 		for($i=0; $i<count($this->tokens); $i++)
 		{
       $this->backticks($i);
@@ -82,7 +82,6 @@ class token {
       $this->token_process($i);
 		}
 		// return tokens with rearranged key index
-    print_r($this->tokens);
 		$this->tokens = array_values($this->tokens);
 	}
   
@@ -94,7 +93,7 @@ class token {
     {		
       $f=1;
       while( $this->tokens[$i+$f] !== '`' && $this->tokens[$i+$f] !== ';' )
-      {		
+      {
         // get line_nr of any near token
         if( is_array($this->tokens[$i+$f]) )
           $line_nr = $this->tokens[$i+$f][2];

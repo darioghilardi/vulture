@@ -76,7 +76,7 @@ class scan {
   /**
    * scan_file: Scan a file.
    */
-  function scan_file($i, $token_name, $token_value, $line_nr)
+  function scan_file()
 	{
 		// scan all tokens of file
 		for($i=0,$tokencount=count($this->tokens); $i<$tokencount;  $i++)

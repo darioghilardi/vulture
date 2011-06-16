@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 **/
 
-include 'config/general.php';
+//include 'config/general.php';
 
 ?><html>
 <head>
@@ -156,7 +156,7 @@ include 'config/general.php';
 <div id="result">
 	
 	<div style="margin-left:30px;color:#000000;font-size:14px">
-		<h3>Quickstart:</h3>
+        <h3>Quickstart:</h3>
 		<p>Locate your PHP <b>path/file</b>, choose the <b>vulnerability type</b> you are looking for and click <u>scan</u>!<br />
 		Check <b>subdirs</b> to include subdirectories into the scan. Note that scanning too many large files may exceed the time limit.</p>
 		<h3>Advanced:</h3>
@@ -181,6 +181,7 @@ include 'config/general.php';
 	</div>
 	
 </div>
+
 
 </body>
 </html>
