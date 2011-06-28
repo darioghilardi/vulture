@@ -1,20 +1,4 @@
 <?php
-/** 
-
-RIPS - A static source code analyser for vulnerabilities in PHP scripts 
-	by Johannes Dahse (johannesdahse@gmx.de)
-			
-
-Copyright (C) 2010 Johannes Dahse
-
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program; if not, see <http://www.gnu.org/licenses/>.		
-
-**/
-
 // xhprof profiler enabling tracking
 if (extension_loaded('xhprof')) {
     include_once '/usr/share/php/PEAR/share/pear/xhprof_lib/utils/xhprof_lib.php';

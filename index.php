@@ -7,6 +7,9 @@
  * 		
  **/
 
+// Execute main processing if a value was submitted.
+if ($_POST)
+    require_once('main.php');
 ?>
 
 <!doctype html>
@@ -41,12 +44,12 @@
 		</header>
 
 		<div id="main" role="main">
-            <form id="payment">
+            <form id="scan" method="POST" action=".">
                 <fieldset>
                     <ul>
                         <li>
                             <label for="files">Files/Directory:</label>
-                            <input id="files" name="files" type=text placeholder="Add here the path to files or a directory..." required autofocus>
+                            <input id="files" name="files" type=text placeholder="Add here the path to files..." required autofocus>
                         </li>
                         <li>
                             <button type="submit">Launch</button>
@@ -57,7 +60,8 @@
                 
             <div id="output">
                 <h3>Help:</h3>
-                <p>Locate the path to the PHP files you would like to scan and click the launch button. You can also submit a directory.</p>
+                <p>Locate the path to the PHP files you would like to scan and click the launch button. You can also submit a directory 
+                    that Vulture will recursively scan.</p>
                 <p>Note that scanning too many large files may exceed the time limit.</p>
                 
             </div>
