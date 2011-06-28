@@ -65,7 +65,7 @@
 		</div>
 
 		<footer>
-            <p> - &copy; 2011 Dario Ghilardi</p>
+            <p> Vulture - &copy; 2011 Dario Ghilardi</p>
 		</footer>
 	</div>
 
