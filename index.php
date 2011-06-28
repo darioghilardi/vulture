@@ -34,32 +34,32 @@
 <body>
 	<div id="container">
 		<header>
+            
+            <h1><a href="index.php">Vulture</a></h1>
+            <h5>Static source code analyzer for PHP vulnerabilities.</h5>
 
 		</header>
 
 		<div id="main" role="main">
             <form id="payment">
                 <fieldset>
-                    <legend>Launch the scan</legend>
-                    <ol>
+                    <ul>
                         <li>
-                            <label for="files">Files/Directory</label>
+                            <label for="files">Files/Directory:</label>
                             <input id="files" name="files" type=text placeholder="Add here the path to files or a directory..." required autofocus>
                         </li>
                         <li>
                             <button type="submit">Launch</button>
                         </li>
-                    </ol>
+                    </ul>
                 </fieldset>
             </form>
                 
-            <div id="result">
-	
-                <div style="margin-left:30px;color:#000000;font-size:14px">
-                    <h3>Guide:</h3>
-                    <p>Locate the path to the PHP files you would like to scan and click the launch button. You can also submit a directory.</p>
-                    <p>Note that scanning too many large files may exceed the time limit.</p>
-                </div>
+            <div id="output">
+                <h3>Help:</h3>
+                <p>Locate the path to the PHP files you would like to scan and click the launch button. You can also submit a directory.</p>
+                <p>Note that scanning too many large files may exceed the time limit.</p>
+                
             </div>
                 
 		</div>

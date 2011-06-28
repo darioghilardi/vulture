@@ -75,8 +75,63 @@ h1, h2, h3, h4, h5, h6 { font-weight: bold; }
 a, a:active, a:visited { color: #607890; }
 a:hover { color: #036; }
 
-footer {
+header {
+    background-color: #2E4A55;
+    padding: 20px;
+}
+
+header > h1 > a{
+    font-size: 36px;
+    color: #fff;
+    text-decoration: none;
+}
+
+header > h1 > a:hover {
+    color: #fff;
+}
+
+header > h5 {
+    color: #fff;
+}
+
+#main {
+    font-size: 14px;
+    padding: 20px;
+}
+
+#main ul {
     text-align: center;
+    margin-top: 80px;
+}
+
+#main ul li {
+    list-style-type: none;  
+}
+
+#main ul li label {
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 20px;
+}
+
+#main ul li input#files {
+    height: 25px;
+    font-size: 18px;
+    width: 400px;
+}
+
+#main ul li button {
+    margin-top: 20px;
+}
+
+#main #output {
+    margin: 80px 0 30px 0;
+}
+
+footer {
+    border-top: 2px solid #2E4A55;
+    text-align: center;
+    padding: 10px;
 }
 
 
