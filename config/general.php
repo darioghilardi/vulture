@@ -10,9 +10,6 @@ class Config {
     
     private static $instance;
     
-    // RIPS version to be displayed	
-    public $version = '0.36';
-    
     // Maximum of parameter traces per PVF find
     public $maxtrace = 30;
     
@@ -21,15 +18,6 @@ class Config {
     
     // Default directory shown
     public $basedir = '';
-    
-    // PHP documentation path
-    public $doku = 'http://php.net/';
-    
-    // Available code stylesheets
-    public $stylesheets = array('phps', 'code-dark', 'twilight', 'espresso', 
-                                'sunburst', 'barf', 'notepad++', 'ayti1', 
-                                'ayti2'
-                                );
     
     // Deafult code stylesheet
     public $default_stylesheet = 'twilight';
