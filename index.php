@@ -1,6 +1,6 @@
 <?php
 /**
- *  - Static source code analyzer for PHP vulnerabilities.
+ * Vulture - Static source code analyzer for PHP vulnerabilities.
  * 
  * @author Dario Ghilardi <darioghilardi@webrain.it>
  * @copyright Copyright (c) 2011, Dario Ghilardi
@@ -19,7 +19,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	
-	<title>- Static source code analyzer for PHP vulnerabilities.</title>
+	<title>Vulture - Static source code analyzer for PHP vulnerabilities.</title>
 	<meta name="description" content="">
 	<meta name="author" content="">
 	
