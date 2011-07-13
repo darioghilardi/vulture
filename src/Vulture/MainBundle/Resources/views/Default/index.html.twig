@@ -1,0 +1,42 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <div id="container">
+        <header>
+
+            <h1><a href="{{ path('VultureMainBundle_homepage') }}">Vulture</a></h1>
+            <h5>Static source code analyzer for PHP vulnerabilities.</h5>
+
+        </header>
+
+        <div id="main" role="main">
+            {% if form is defined %}
+            
+                <form action="{{ path('VultureMainBundle_homepage') }}" method="post" {{ form_enctype(form) }}>
+                    {{ form_widget(form) }}
+
+                    <input id="submit" type="submit" />
+                </form>
+            
+            {% elseif results %}
+            
+                <h2>Scanned files</h5>
+                <ul>
+                    {% for file in files %}
+                        <li>{{ file }}</li>
+                    {% endfor %}
+                </ul>
+                    
+            {% endif %}
+
+            <div id="output">
+                <h3>Help:</h3>
+                <p>Locate the path to the PHP files you would like to scan and click the launch button. You can also submit a directory 
+                    that Vulture will recursively scan.</p>
+                <p>Note that scanning too many large files may exceed the time limit.</p>
+
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

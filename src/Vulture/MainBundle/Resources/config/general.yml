@@ -1,0 +1,16 @@
+parameters:
+  vulture_main:
+    maxtrace: 30
+    warnfiles: 40
+    subdirs: true
+    default_stylesheet: twilight
+    filetypes:
+      - .php
+      - .inc
+      - .phps
+      - .php4
+      - .php5
+      - .phtml
+      - .tpl
+      - .cgi
+      - .module

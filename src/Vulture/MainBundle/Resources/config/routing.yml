@@ -1,0 +1,8 @@
+VultureMainBundle_homepage:
+    pattern:  /
+    defaults: { _controller: VultureMainBundle:Default:index }
+    
+
+VultureMainBundle_results:
+    pattern:   /results
+    defaults:  { _controller: VultureMainBundle:Default:results }

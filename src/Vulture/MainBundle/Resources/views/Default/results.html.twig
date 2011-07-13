@@ -1,0 +1,22 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <div id="container">
+        <header>
+
+            <h1><a href="{{ path('VultureMainBundle_homepage') }}">Vulture</a></h1>
+            <h5>Static source code analyzer for PHP vulnerabilities.</h5>
+
+        </header>
+
+        <div id="main" role="main">
+
+            <div id="output">
+                <h3>Results:</h3>
+                <p>Results</p>
+
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
