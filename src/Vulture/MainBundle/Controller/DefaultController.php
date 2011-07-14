@@ -4,6 +4,7 @@ namespace Vulture\MainBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Vulture\MainBundle\Entity\Scan;
+use Vulture\MainBundle\Entity\Tokens;
 
 class DefaultController extends Controller
 {
@@ -28,6 +29,14 @@ class DefaultController extends Controller
                 
                 // Search for files to scan into the directory
                 $scan->getFiles();
+                
+                // For every file, get the tokens
+                foreach ($scan->files as $source) {
+                    
+                    // Build the full token representation of the code
+                    $tokenized = new Tokens();
+                    $tokenized->build();
+                }
                 
                 // Output the results                
                 return $this->render('VultureMainBundle:Default:index.html.twig', array(
