@@ -44,14 +44,28 @@ class HttpParameterPollution {
     );
     
     public $ignore_tokens = array (
-		T_BAD_CHARACTER,
+		
+        // anything below ASCII 32 except \t (0x09), \n (0x0a) and \r (0x0d)
+        T_BAD_CHARACTER,
+        T_CONSTANT_ENCAPSED_STRING,
+        // PHPDoc style comments
 		T_DOC_COMMENT,
+        
+        // comments // or #, and /* */
 		T_COMMENT,
-		//T_ML_COMMENT,
+        
+        // comments /* and */
+		/*T_ML_COMMENT,*/
+        
+        // text outside PHP
 		T_INLINE_HTML,
+        
+        // \t \r \n
 		T_WHITESPACE,
-		T_OPEN_TAG
-		//T_CLOSE_TAG
+        
+        // <?php, <? or <% and related closing tags
+		T_OPEN_TAG,
+		T_CLOSE_TAG,
     );
     
     /**
@@ -69,6 +83,10 @@ class HttpParameterPollution {
         return self::$instance;
     }
     
+    /**
+     * Called before the code is checked to remove unuseful token for 
+     * HPP type of scan.
+     */
     public static function additionalCleaning() {
         
     }

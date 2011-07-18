@@ -31,17 +31,23 @@ class Tokens {
      * @param type $source
      */
     public function build() {
+        
         $this->conf = HttpParameterPollution::getInstance();
         
         $this->source = file_get_contents($this->filename);
         
         $this->tokens = token_get_all($this->source);
         
+        // For the strange token_get_all behaviour that leave empty array 
+        // elements i need to use array_values
+        $this->tokens = array_values($this->tokens);
+        echo "<pre>".print_r($this->tokens,1)."</pre>";
+        
         $this->pt();
         
         $this->clean();
         
-        $this->pt();
+        //$this->pt();
         
         $this->pat();
                
@@ -59,21 +65,25 @@ class Tokens {
      */
 	public function clean()
 	{	
-        
+        print_r($this->conf->ignore_tokens);
         for ($i = 0; $i < count($this->tokens); $i++) {
             if( is_array($this->tokens[$i]) ) {
                 
                 // Remove not needed tokens reived from the configuration class
                 if ( in_array($this->tokens[$i][0], $this->conf->ignore_tokens) ) {
-                    array_splice($this->tokens, $i, 1);
+                    print $this->tokens[$i][0]. " ";
+                    unset($this->tokens[$i]);
                 }
                 
                 $this->conf->additionalCleaning();
+                
             } else {
                 
                 
             }
         }
+        // Need to check why here some tags are missing.
+        $this->tokens = array_values($this->tokens);
         
         
         /*for($i=0, $c=count($this->tokens); $i<$c; $i++)
@@ -120,11 +130,10 @@ class Tokens {
      * Print tokens into a readable format.
      */
     public function pt() {
-        $res = array();
-        while(list($key, $val) = each($this->tokens)) {
+        foreach ($this->tokens as $key => $val) {
             if(is_array($val)) {
-                $val2 = $val[1] . ' - ' . token_name($val[0]) . ' : ' .  $val[2];
-                $res[$key] = $val2;
+                $string = htmlentities($val[1]) ." - (". $val[0] .") ". token_name($val[0]) ." : $val[2]";
+                $res[$key] = $string;
             } else {
                 $res[$key] = $val;
             }
