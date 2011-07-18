@@ -68,6 +68,10 @@ class HttpParameterPollution {
 
         return self::$instance;
     }
+    
+    public static function additionalCleaning() {
+        
+    }
 }
 
 ?>

@@ -31,10 +31,10 @@ class DefaultController extends Controller
                 $scan->getFiles();
                 
                 // For every file, get the tokens
-                foreach ($scan->files as $source) {
+                foreach ($scan->files as $file) {
                     
                     // Build the full token representation of the code
-                    $tokenized = new Tokens();
+                    $tokenized = new Tokens($file);
                     $tokenized->build();
                 }
                 
