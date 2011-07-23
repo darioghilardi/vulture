@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Scan Class: Scan parameters definition.
+ * Scan Class: Find files and define parameters.
  */
 
 namespace Vulture\MainBundle\Entity;

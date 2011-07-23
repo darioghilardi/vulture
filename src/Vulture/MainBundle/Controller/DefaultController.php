@@ -5,6 +5,7 @@ namespace Vulture\MainBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Vulture\MainBundle\Entity\Scan;
 use Vulture\MainBundle\Entity\Tokens;
+use Vulture\MainBundle\Entity\Processor;
 
 class DefaultController extends Controller
 {
@@ -33,9 +34,13 @@ class DefaultController extends Controller
                 // For every file, get the tokens
                 foreach ($scan->files as $file) {
                     
-                    // Build the full token representation of the code
+                    // Build the full token representation of the code and manage includes
                     $tokenized = new Tokens($file);
                     $tokenized->build();
+                    
+                    // Execute the processing
+                    $process = new Processor($tokenized->source, $tokenized->tokens);
+                    $process->launch();
                 }
                 
                 // Output the results                

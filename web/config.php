@@ -4,19 +4,20 @@ if (!isset($_SERVER['HTTP_HOST'])) {
     die('This script cannot be run from the CLI. Run it from a browser.');
 }
 
-$chk_arr = array(
-	'192.168.6',
-	'192.168.1',
-	'127.0.0.1',
-    '172.20.10',
+$checklist = array(
+	array('192','168','6'),
+	array('192','168','1'),
+	array('127','0','0'),
+    array('172','20','1'),
+    array('192','168','4'),
 );
 
-foreach ($chk_arr as $chk) {
-  if (!in_array(substr($_SERVER['REMOTE_ADDR'],0,strlen($chk)), $chk_arr))
-  {
+$server = array_slice(explode('.', $_SERVER['REMOTE_ADDR']), 0, 3);
+
+if (!in_array($server, $checklist))
+{
    	header('HTTP/1.0 403 Forbidden');
    	die('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
-  }
 }
 
 $majorProblems = array();

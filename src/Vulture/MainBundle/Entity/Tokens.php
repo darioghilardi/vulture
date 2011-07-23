@@ -13,9 +13,8 @@ use Vulture\MainBundle\SecurityLibs\HttpParameterPollution;
 class Tokens {
     
     public $filename;    
-    public $source = array();
-    public $lines_pointer;
-    public $tokens = array();
+    public $source;
+    public $tokens;
     public $conf;
     
     /**
@@ -39,15 +38,24 @@ class Tokens {
         $this->tokens = token_get_all($this->source);
         
         // For the strange token_get_all behaviour that leave empty array 
-        // elements i need to use array_values
+        // elements i need to use array_values to reorder indexes
         $this->tokens = array_values($this->tokens);
-        echo "<pre>".print_r($this->tokens,1)."</pre>";
+                
+        // Get the initial number of tokens
+        $ntokens = count($this->tokens);
+        for ($i = 0; $i < $ntokens; $i++) {
+            
+            // Clean tokens
+            $this->clean($i);
+            
+            // Reconstruct arrays into one single token
+            $this->manageArrays($i);
+        }
+        
+        // Rearrange the array as some indexes have been removed
+        $this->tokens = array_values($this->tokens);
         
         $this->pt();
-        
-        $this->clean();
-        
-        //$this->pt();
         
         $this->pat();
                
@@ -63,67 +71,65 @@ class Tokens {
      * [1] => String content
      * [2] => Line number
      */
-	public function clean()
-	{	
-        print_r($this->conf->ignore_tokens);
-        for ($i = 0; $i < count($this->tokens); $i++) {
-            if( is_array($this->tokens[$i]) ) {
+	public function clean($i)
+	{       
+        if( is_array($this->tokens[$i]) ) {
                 
-                // Remove not needed tokens reived from the configuration class
-                if ( in_array($this->tokens[$i][0], $this->conf->ignore_tokens) ) {
-                    print $this->tokens[$i][0]. " ";
-                    unset($this->tokens[$i]);
-                }
+            // Remove not needed token types received from the configuration class
+            if ( in_array($this->tokens[$i][0], $this->conf->ignore_tokens) ) {
+                unset($this->tokens[$i]);
+            }
                 
-                $this->conf->additionalCleaning();
+            // Launch additional cleaning from the securitylibs classes
+            $this->conf->additionalCleaning();
                 
-            } else {
+        } else {        
                 
-                
+        }      
+    }
+    
+    /**
+     * Manage PHP arrays. 
+     * 
+     * As default they're arrays are separated into different tokens, because of the brackets. 
+     * This method assemble them into one single token with a new array at the index 3,
+     * removing brackets:
+     * [0] => Token numeric index
+     * [1] => String content
+     * [2] => Line number 
+     * [3] => array(
+     *   [1] => Token numeric index (ex. T_CONSTANT_ENCAPSED_STRING)
+     *   [2] => String content (ex. index)
+     *   [3] => Line number (ex. 1)
+     */
+    public function manageArrays($i) {
+        
+        // if i find a variable and the next token is an open bracket start the reconstruction
+        if ( 
+            (isset($this->tokens[$i][0])) &&
+            ($this->tokens[$i][0] == T_VARIABLE) &&
+            ($this->tokens[$i+1] == '[')
+           ) {            
+            $variableIndex = $i;
+            $counter = $variableIndex++;
+            
+            // while the current token is not the last token that compose the array
+            while ( ($this->tokens[$counter] != ']') || ($this->tokens[$counter+1] == '[') ) {
+                print_r($this->tokens[$variableIndex]);
+                die;
+                // if the token is an index of the array
+                /*if ( ($this->tokens[$counter][0] == T_CONSTANT_ENCAPSED_STRING) ||  
+                     ($this->tokens[$counter][0] == T_VARIABLE) ) {
+                    
+                    // save it into the third element of the array
+                    print $this->tokens[$variableIndex];
+                    $this->tokens[$variableIndex][] = $this->tokens[$counter];
+                    
+                    // unset the token as I moved it
+                    unset($this->tokens[$counter]);
+                }*/
             }
         }
-        // Need to check why here some tags are missing.
-        $this->tokens = array_values($this->tokens);
-        
-        
-        /*for($i=0, $c=count($this->tokens); $i<$c; $i++)
-		{
-			if( is_array($this->tokens[$i]) ) 
-			{
-				if( in_array($this->tokens[$i][0], $T_IGNORE) )
-					unset($this->tokens[$i]);
-				else if( $this->tokens[$i][0] === T_CLOSE_TAG )
-					$this->tokens[$i] = ';';	
-				else if( $this->tokens[$i][0] === T_CONSTANT_ENCAPSED_STRING )
-					$this->tokens[$i][1] = str_replace('"', "'", $this->tokens[$i][1]);
-			}
-			// ternary operator gives headaches, only partly supported
-			else if($this->tokens[$i] === '?')
-			{
-				$d=1;
-				// find last token before '?'
-				while( !isset($this->tokens[$i-$d]) )
-				{
-					if($d>10)break;
-					$d++;
-				}
-				// if condition in paranthesis ( )
-				if($this->tokens[$i-$d] === ')')
-				{
-					$d=1;
-					while( isset($this->tokens[$i-$d]) && $this->tokens[$i-$d] !== '(' )
-					{
-						// delete condition, because vars should not be traced
-						unset($this->tokens[$i-$d]);
-						if($d>20)break;
-						$d++;
-					}
-				}
-			}
-		}
-		
-		// return tokens with rearranged key index
-		$this->tokens = array_values($this->tokens);*/
     }
     
     /**
@@ -133,6 +139,8 @@ class Tokens {
         foreach ($this->tokens as $key => $val) {
             if(is_array($val)) {
                 $string = htmlentities($val[1]) ." - (". $val[0] .") ". token_name($val[0]) ." : $val[2]";
+                $string = str_replace("\n", "", $string);
+                $string = str_replace("\r", "", $string);
                 $res[$key] = $string;
             } else {
                 $res[$key] = $val;

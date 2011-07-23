@@ -47,7 +47,7 @@ class HttpParameterPollution {
 		
         // anything below ASCII 32 except \t (0x09), \n (0x0a) and \r (0x0d)
         T_BAD_CHARACTER,
-        T_CONSTANT_ENCAPSED_STRING,
+
         // PHPDoc style comments
 		T_DOC_COMMENT,
         
