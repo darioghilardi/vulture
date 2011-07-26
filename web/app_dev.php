@@ -8,6 +8,7 @@ $checklist = array(
 	array('127','0','0'),
     array('172','20','1'),
     array('192','168','4'),
+    array('192','168','43'),
 );
 
 $server = array_slice(explode('.', $_SERVER['REMOTE_ADDR']), 0, 3);

@@ -41,7 +41,7 @@ class Tokens {
         // elements i need to use array_values to reorder indexes
         $this->tokens = array_values($this->tokens);
                 
-        // Get the initial number of tokens
+        // Loop through the tokens array
         $ntokens = count($this->tokens);
         for ($i = 0; $i < $ntokens; $i++) {
             
@@ -52,8 +52,7 @@ class Tokens {
             $this->manageArrays($i);
         }
         
-        // Rearrange the array as some indexes have been removed
-        $this->tokens = array_values($this->tokens);
+        $this->removeMarkedTokens();
         
         $this->pt();
         
@@ -70,18 +69,20 @@ class Tokens {
      * [0] => Token numeric index
      * [1] => String content
      * [2] => Line number
+     * [3] => Multidimensional array indexes, not involved into this function
+     * [4] => Token marked for removal
      */
 	public function clean($i)
 	{       
         if( is_array($this->tokens[$i]) ) {
                 
-            // Remove not needed token types received from the configuration class
+            // Mark for removal not needed token types received from the configuration class
             if ( in_array($this->tokens[$i][0], $this->conf->ignore_tokens) ) {
-                unset($this->tokens[$i]);
+                $this->tokens[$i][4] = true;
             }
                 
             // Launch additional cleaning from the securitylibs classes
-            $this->conf->additionalCleaning();
+            $this->conf->additionalCleaning();           
                 
         } else {        
                 
@@ -91,7 +92,7 @@ class Tokens {
     /**
      * Manage PHP arrays. 
      * 
-     * As default they're arrays are separated into different tokens, because of the brackets. 
+     * As default arrays are separated into different tokens, because of the brackets. 
      * This method assemble them into one single token with a new array at the index 3,
      * removing brackets:
      * [0] => Token numeric index
@@ -101,6 +102,7 @@ class Tokens {
      *   [1] => Token numeric index (ex. T_CONSTANT_ENCAPSED_STRING)
      *   [2] => String content (ex. index)
      *   [3] => Line number (ex. 1)
+     * [4] => Token marked for removal
      */
     public function manageArrays($i) {
         
@@ -110,30 +112,58 @@ class Tokens {
             ($this->tokens[$i][0] == T_VARIABLE) &&
             ($this->tokens[$i+1] == '[')
            ) {            
-            $variableIndex = $i;
-            $counter = $variableIndex++;
+            $arrayIndex = $i;
+            $counter = $arrayIndex + 1;
             
             // while the current token is not the last token that compose the array
             while ( ($this->tokens[$counter] != ']') || ($this->tokens[$counter+1] == '[') ) {
-                print_r($this->tokens[$variableIndex]);
-                die;
                 // if the token is an index of the array
-                /*if ( ($this->tokens[$counter][0] == T_CONSTANT_ENCAPSED_STRING) ||  
+                if ( ($this->tokens[$counter][0] == T_CONSTANT_ENCAPSED_STRING) ||  
                      ($this->tokens[$counter][0] == T_VARIABLE) ) {
                     
                     // save it into the third element of the array
-                    print $this->tokens[$variableIndex];
-                    $this->tokens[$variableIndex][] = $this->tokens[$counter];
+                    $this->tokens[$arrayIndex][3][] = $this->tokens[$counter];
                     
-                    // unset the token as I moved it
-                    unset($this->tokens[$counter]);
-                }*/
+                    echo "<pre>".print_r($this->tokens,1)."</pre>";
+                    $this->pt();
+                    
+                    // mark for removal the tokens with array indexes as I moved 
+                    // them into the third element of the array
+                    $this->tokens[$counter][4] = true;
+                }
+                $counter++;
             }
         }
     }
     
     /**
+     * Remove the tokens marked for removal.
+     * 
+     * As the clean and the manageArrays functions deletes and move tokens into 
+     * the multidimensional tokens array, it's obvoius that tokens will lose 
+     * their index into the array. Calling unset and array_values to fix
+     * indexes often is very inefficient. Instead, the previous functions marks
+     * some tokens to be deleted, and removeMarkedTokens execute the delete on
+     * a single loop.
+     */    
+    public function removeMarkedTokens() {
+        
+        // Loop through elements to remove tokens marked for removal
+        for ($i = 0; $i < count($this->tokens); $i++) {
+            if (isset($this->tokens[$i][4]) && ($this->tokens[$i][4])) {
+                unset($this->tokens[$i]);
+            }
+        }
+        
+        // Rearrange the array as some indexes have been removed
+        $this->tokens = array_values($this->tokens);
+    }
+    
+    /**
      * Print tokens into a readable format.
+     * 
+     * Fix this function to print the multidimensional arrays.
+     * 
      */
     public function pt() {
         foreach ($this->tokens as $key => $val) {
@@ -142,6 +172,9 @@ class Tokens {
                 $string = str_replace("\n", "", $string);
                 $string = str_replace("\r", "", $string);
                 $res[$key] = $string;
+                if (isset($val[3]) && is_array($val[3])) {
+                    // Here the fix.
+                }
             } else {
                 $res[$key] = $val;
             }
