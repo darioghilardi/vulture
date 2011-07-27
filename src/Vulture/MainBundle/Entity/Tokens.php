@@ -41,52 +41,62 @@ class Tokens {
         // elements i need to use array_values to reorder indexes
         $this->tokens = array_values($this->tokens);
                 
-        // Loop through the tokens array
-        $ntokens = count($this->tokens);
-        for ($i = 0; $i < $ntokens; $i++) {
-            
-            // Clean tokens
-            $this->clean($i);
-            
-            // Reconstruct arrays into one single token
-            $this->manageArrays($i);
-        }
+        // Clean tokens
+        $this->clean();
+        
+        $this->ptReadable();
+        
+        // Reconstruct arrays into one single token
+        $this->manageArrays();
+        
+        $this->pt();
+        $this->ptReadable();
+        
+        $this->pat();
+        die;
         
         $this->removeMarkedTokens();
         
-        $this->pt();
         
-        $this->pat();
                
     }
     
     /**
      * Delete all tokens to ignore while scanning
      * 
-     * Into the tokens array it's unuseful to keep the html code, the array needs to be light.
+     * Into the tokens array it's unuseful to keep the html code, the array 
+     * needs to be light. This function run into his own loop to clean whitespaces
+     * as they can be tricky to be removed later.
      *
      * Every token is an array following the convention:
      * [0] => Token numeric index
      * [1] => String content
      * [2] => Line number
      * [3] => Multidimensional array indexes, not involved into this function
-     * [4] => Token marked for removal
      */
-	public function clean($i)
-	{       
-        if( is_array($this->tokens[$i]) ) {
+	public function clean()
+	{
+        // Loop through the tokens array
+        $ntokens = count($this->tokens);
+        
+        for ($i = 0; $i < $ntokens; $i++) {
+            if( is_array($this->tokens[$i]) ) {
                 
-            // Mark for removal not needed token types received from the configuration class
-            if ( in_array($this->tokens[$i][0], $this->conf->ignore_tokens) ) {
-                $this->tokens[$i][4] = true;
+                // Mark for removal not needed token types received from the configuration class
+                if ( in_array($this->tokens[$i][0], $this->conf->ignore_tokens) ) {
+                    unset($this->tokens[$i]);
+                }
+                
+                // Launch additional cleaning from the securitylibs classes
+                $this->conf->additionalCleaning();           
+                
+            } else {        
+                
             }
-                
-            // Launch additional cleaning from the securitylibs classes
-            $this->conf->additionalCleaning();           
-                
-        } else {        
-                
-        }      
+        }
+        
+        // Rearrange the array as some indexes have been removed
+        $this->tokens = array_values($this->tokens);
     }
     
     /**
@@ -96,42 +106,74 @@ class Tokens {
      * This method assemble them into one single token with a new array at the index 3,
      * removing brackets:
      * [0] => Token numeric index
-     * [1] => String content
-     * [2] => Line number 
-     * [3] => array(
-     *   [1] => Token numeric index (ex. T_CONSTANT_ENCAPSED_STRING)
-     *   [2] => String content (ex. index)
-     *   [3] => Line number (ex. 1)
-     * [4] => Token marked for removal
+     * [1] => String content (ex. $_GET)
+     * [2] => Line number
+     * [3] => String content of the full array without array name (ex. ['p'])
+     * 
      */
-    public function manageArrays($i) {
+    public function manageArrays() {
         
-        // if i find a variable and the next token is an open bracket start the reconstruction
-        if ( 
-            (isset($this->tokens[$i][0])) &&
-            ($this->tokens[$i][0] == T_VARIABLE) &&
-            ($this->tokens[$i+1] == '[')
-           ) {            
-            $arrayIndex = $i;
-            $counter = $arrayIndex + 1;
-            
-            // while the current token is not the last token that compose the array
-            while ( ($this->tokens[$counter] != ']') || ($this->tokens[$counter+1] == '[') ) {
-                // if the token is an index of the array
-                if ( ($this->tokens[$counter][0] == T_CONSTANT_ENCAPSED_STRING) ||  
-                     ($this->tokens[$counter][0] == T_VARIABLE) ) {
+       $ntokens = count($this->tokens);
+       
+       for ($i = 0; $i < $ntokens; $i++) {
+           
+            // if i find a variable and the next token is an open bracket
+            if (
+                (isset($this->tokens[$i][0])) &&
+                ($this->tokens[$i][0] == T_VARIABLE) &&
+                ($this->tokens[$i+1] == '[')
+               ) {
+                
+                // Setup indexes to cycle through array elements
+                $multidimArrayIndex = $i;
+                $arrayNavigator = $multidimArrayIndex + 1;
+                
+                // Setup a counter for brackets
+                $brackets = 0;
+                
+                // Prepare the third element of the array to be filled with a string
+                $this->tokens[$multidimArrayIndex][3] = '';
+
+                // Loop through array elements
+                while (true) {
                     
-                    // save it into the third element of the array
-                    $this->tokens[$arrayIndex][3][] = $this->tokens[$counter];
+                    // Save into the tokens array the string representation of 
+                    // the full array
+                    if (is_array($this->tokens[$arrayNavigator])) {
+                        $this->tokens[$multidimArrayIndex][3] .= $this->tokens[$arrayNavigator][1];
+                        print $this->tokens[$arrayNavigator][1];
+                    } else {
+                        $this->tokens[$multidimArrayIndex][3] .= $this->tokens[$arrayNavigator];
+                        print $this->tokens[$arrayNavigator];
+                    }
                     
-                    echo "<pre>".print_r($this->tokens,1)."</pre>";
-                    $this->pt();
+                    // Count brackets, needed to decide when to stop the loop
+                    if ($this->tokens[$arrayNavigator] == '[')
+                        $brackets++;
+                    elseif ($this->tokens[$arrayNavigator] == ']')
+                        $brackets--;
                     
-                    // mark for removal the tokens with array indexes as I moved 
-                    // them into the third element of the array
-                    $this->tokens[$counter][4] = true;
+                    // remove 
+                    unset($this->tokens[$arrayNavigator]);
+                    
+                    // Next array element
+                    $arrayNavigator++; 
+                    
+                    // Exit from the loop when:
+                    // - there're no more tokens into $this->tokens
+                    // - it reaches the last ] of the array
+                    // The break statement is used instead of complicated 
+                    // conditions into the while statement
+                    if ( (!isset($this->tokens[$arrayNavigator])) || 
+                         ($this->tokens[$arrayNavigator] != '[') && ($brackets == 0))
+                        break;
                 }
-                $counter++;
+                
+                // Remove the last ']' token, leaved in order to end the previous loop
+                unset($this->tokens[$arrayNavigator]);
+                
+                // Put the $i index at the end of the array
+                $i = $arrayNavigator;
             }
         }
     }
@@ -149,37 +191,75 @@ class Tokens {
     public function removeMarkedTokens() {
         
         // Loop through elements to remove tokens marked for removal
-        for ($i = 0; $i < count($this->tokens); $i++) {
+        $ntokens = count($this->tokens);
+        for ($i = 0; $i < $ntokens; $i++) {
             if (isset($this->tokens[$i][4]) && ($this->tokens[$i][4])) {
+                echo "<pre>".print_r($this->ft($this->tokens[$i]),1)."</pre>";
                 unset($this->tokens[$i]);
             }
         }
-        
-        // Rearrange the array as some indexes have been removed
-        $this->tokens = array_values($this->tokens);
     }
     
     /**
-     * Print tokens into a readable format.
+     * Print tokens into a readable format. Useful to show the tokens but it's
+     * important to know that indexes are reformatted during the printing process.
      * 
-     * Fix this function to print the multidimensional arrays.
-     * 
+     * The method print the tokens into a readable format.
+     * A foreach needs to be added to print multidimensional arrays on index [3].
      */
-    public function pt() {
+    public function ptReadable() {
         foreach ($this->tokens as $key => $val) {
             if(is_array($val)) {
-                $string = htmlentities($val[1]) ." - (". $val[0] .") ". token_name($val[0]) ." : $val[2]";
-                $string = str_replace("\n", "", $string);
-                $string = str_replace("\r", "", $string);
-                $res[$key] = $string;
+                
+                // If it's a multiple token (multidimensional array)
                 if (isset($val[3]) && is_array($val[3])) {
-                    // Here the fix.
+                    
+                    foreach ($val[3] as $value) {
+                        
+                        // print token as an array
+                        $res[$key] = array(
+                            $this->ft($val),
+                            $this->ft($value),
+                            );
+                    }
+                } else {
+                    
+                    // It's a single token, print as string
+                    $res[$key] = $this->ft($val);
                 }
             } else {
                 $res[$key] = $val;
             }
         }
-        echo '<pre>'.print_r($res,1).'</pre>';
+        echo "<pre>".print_r($res,1)."</pre>";
+    }
+    
+    /**
+     * Print tokens as they are.
+     * 
+     * The method print tokens as they're during the execution. They're not
+     * printed into a readable format but it can be useful as ptReadable 
+     * reformat indexes too.
+     */
+    public function pt() {
+        echo "<pre>".print_r($this->tokens,1)."</pre>";
+    }
+    
+    
+    /**
+     * Format tokens.
+     * Utility function to be used while printing into a readable format.
+     */
+    public function ft($array) {
+        
+        // Convert tokens entities
+        $string = htmlentities($array[1]) ." - (". $array[0] .") ". token_name($array[0]) ." : $array[2]";
+        
+        // Remove \n and \r chars
+        $string = str_replace("\n", "", $string);
+        $string = str_replace("\r", "", $string);
+        
+        return $string;
     }
     
     /**
