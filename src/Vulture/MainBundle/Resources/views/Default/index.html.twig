@@ -28,6 +28,13 @@
                 </ul>
                     
             {% endif %}
+            
+            <h3>Tokens:</h3>
+            <ul>
+            {% for token in tokens %}
+                <li>{{ token }}</li>
+            {% endfor %}
+            </ul>
 
             <div id="output">
                 <h3>Help:</h3>

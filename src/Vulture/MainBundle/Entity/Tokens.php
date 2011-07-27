@@ -52,13 +52,7 @@ class Tokens {
         $this->pt();
         $this->ptReadable();
         
-        $this->pat();
-        die;
-        
-        $this->removeMarkedTokens();
-        
-        
-               
+        //$this->pat();
     }
     
     /**
@@ -141,10 +135,8 @@ class Tokens {
                     // the full array
                     if (is_array($this->tokens[$arrayNavigator])) {
                         $this->tokens[$multidimArrayIndex][3] .= $this->tokens[$arrayNavigator][1];
-                        print $this->tokens[$arrayNavigator][1];
                     } else {
                         $this->tokens[$multidimArrayIndex][3] .= $this->tokens[$arrayNavigator];
-                        print $this->tokens[$arrayNavigator];
                     }
                     
                     // Count brackets, needed to decide when to stop the loop
@@ -179,28 +171,6 @@ class Tokens {
     }
     
     /**
-     * Remove the tokens marked for removal.
-     * 
-     * As the clean and the manageArrays functions deletes and move tokens into 
-     * the multidimensional tokens array, it's obvoius that tokens will lose 
-     * their index into the array. Calling unset and array_values to fix
-     * indexes often is very inefficient. Instead, the previous functions marks
-     * some tokens to be deleted, and removeMarkedTokens execute the delete on
-     * a single loop.
-     */    
-    public function removeMarkedTokens() {
-        
-        // Loop through elements to remove tokens marked for removal
-        $ntokens = count($this->tokens);
-        for ($i = 0; $i < $ntokens; $i++) {
-            if (isset($this->tokens[$i][4]) && ($this->tokens[$i][4])) {
-                echo "<pre>".print_r($this->ft($this->tokens[$i]),1)."</pre>";
-                unset($this->tokens[$i]);
-            }
-        }
-    }
-    
-    /**
      * Print tokens into a readable format. Useful to show the tokens but it's
      * important to know that indexes are reformatted during the printing process.
      * 
@@ -208,30 +178,15 @@ class Tokens {
      * A foreach needs to be added to print multidimensional arrays on index [3].
      */
     public function ptReadable() {
-        foreach ($this->tokens as $key => $val) {
+        $output = array();
+        foreach ($this->tokens as $val) {
             if(is_array($val)) {
-                
-                // If it's a multiple token (multidimensional array)
-                if (isset($val[3]) && is_array($val[3])) {
-                    
-                    foreach ($val[3] as $value) {
-                        
-                        // print token as an array
-                        $res[$key] = array(
-                            $this->ft($val),
-                            $this->ft($value),
-                            );
-                    }
-                } else {
-                    
-                    // It's a single token, print as string
-                    $res[$key] = $this->ft($val);
-                }
+                $output[] = $this->ft($val);
             } else {
-                $res[$key] = $val;
+                $output[] = $val;
             }
         }
-        echo "<pre>".print_r($res,1)."</pre>";
+        return $output;
     }
     
     /**
@@ -253,7 +208,10 @@ class Tokens {
     public function ft($array) {
         
         // Convert tokens entities
-        $string = htmlentities($array[1]) ." - (". $array[0] .") ". token_name($array[0]) ." : $array[2]";
+        if (isset($array[3]))
+            $string = htmlentities($array[1].$array[3]) ." - (". $array[0] .") ". token_name($array[0]) ." : $array[2]";
+        else
+            $string = htmlentities($array[1]) ." - (". $array[0] .") ". token_name($array[0]) ." : $array[2]";
         
         // Remove \n and \r chars
         $string = str_replace("\n", "", $string);

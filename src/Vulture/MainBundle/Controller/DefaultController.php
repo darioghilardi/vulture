@@ -38,15 +38,18 @@ class DefaultController extends Controller
                     $tokenized = new Tokens($file);
                     $tokenized->build();
                     
+                    $output = $tokenized->ptReadable();
+                    
                     // Execute the processing
-                    $process = new Processor($tokenized->source, $tokenized->tokens);
-                    $process->launch();
+                    //$process = new Processor($tokenized->source, $tokenized->tokens);
+                    //$process->launch();
                 }
                 
                 // Output the results                
                 return $this->render('VultureMainBundle:Default:index.html.twig', array(
                     'results' => true,
                     'files' => $scan->files,
+                    'tokens' => $output,
                 ));
                 
                 //return $this->redirect($this->generateUrl('VultureMainBundle_results'));
