@@ -16,7 +16,7 @@ class Processor {
     public $source;
     public $tokens;
     public $conf;
-    public $variables = array();
+    public $pvf = array();
 
     public function __construct($source, $tokens) {
         $this->conf = HttpParameterPollution::getInstance();
@@ -26,23 +26,42 @@ class Processor {
     
     /**
      * Launch the processing.
+     * 
+     * The process will scan from the last token to the first, saving just the
+     * variables that are printed.
+     * 
      */
     public function launch() {
         
-        for ($i = 0; $i < count($this->tokens); $i++) {
+        for ($i = count($this->tokens) -1 ; $i > 0; $i--) {
+            
             // Detect variables
-            $this->varDetect($i);
+            $this->printDetect($i);
         }
         
-        print_r($this->variables);
+        print_r($this->pvf);
     }
     
     /**
-     * Detect variables and put them into the variables array
+     * Detect print statement and save the correspondent variable.
      */
-    public function varDetect($i) {
-        if ( ($this->tokens[$i][0] == T_VARIABLE) && (!in_array($this->tokens[$i][1], $this->variables))) {
-            $this->variables[] = $this->tokens[$i][1];
+    public function printDetect($i) {
+        
+        // If a print or echo statements are found
+        if ( ($this->tokens[$i][0] == T_ECHO) || ($this->tokens[$i][0] == T_PRINT) ) {
+            
+            echo "cioap";
+            
+            // Start a loop from this element to find what has been printed until ;
+            $k = $i;
+            /*while ($this->tokens[$k][1] == ';') {
+                
+                // Save the printed elements into the pvf array
+                $this->pvf[] = $this->tokens[$k];
+                
+                // Move index to the next element
+                $k++;
+            }*/
         }
     }
 }

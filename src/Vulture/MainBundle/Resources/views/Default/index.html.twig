@@ -18,31 +18,44 @@
                     <input id="submit" type="submit" />
                 </form>
             
-            {% elseif results %}
-            
-                <h2>Scanned files</h5>
-                <ul>
-                    {% for file in files %}
-                        <li>{{ file }}</li>
-                    {% endfor %}
-                </ul>
-                    
-            {% endif %}
-            
-            <h3>Tokens:</h3>
-            <ul>
-            {% for token in tokens %}
-                <li>{{ token }}</li>
-            {% endfor %}
-            </ul>
-
-            <div id="output">
                 <h3>Help:</h3>
                 <p>Locate the path to the PHP files you would like to scan and click the launch button. You can also submit a directory 
                     that Vulture will recursively scan.</p>
                 <p>Note that scanning too many large files may exceed the time limit.</p>
-
-            </div>
+            
+            {% elseif results %}
+            
+                <div id="output">
+                    <h2>Scanned files</h5>
+                    <ul>
+                        {% for file in files %}
+                            <li>{{ file }}</li>
+                        {% endfor %}
+                    </ul>
+                
+            
+                <h3>Tokens:</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>Token code</td>
+                                <td>Token value</td>
+                                <td>Source line</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for token in tokens %}
+                                <tr>
+                                    <td>{{ token['value'] }}</td>
+                                    <td>{{ token['text'] }}</td>
+                                    <td>{{ token['line'] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                    
+            {% endif %}
 
         </div>
     </div>

@@ -44,13 +44,10 @@ class Tokens {
         // Clean tokens
         $this->clean();
         
-        $this->ptReadable();
+        $this->pt();
         
         // Reconstruct arrays into one single token
-        $this->manageArrays();
-        
-        $this->pt();
-        $this->ptReadable();
+        $this->manageArrays();       
         
         //$this->pat();
     }
@@ -159,15 +156,15 @@ class Tokens {
                     if ( (!isset($this->tokens[$arrayNavigator])) || 
                          ($this->tokens[$arrayNavigator] != '[') && ($brackets == 0))
                         break;
-                }
-                
-                // Remove the last ']' token, leaved in order to end the previous loop
-                unset($this->tokens[$arrayNavigator]);
+                }                
                 
                 // Put the $i index at the end of the array
                 $i = $arrayNavigator;
             }
         }
+        
+        // Reorder tokens array, some indexes are empty due to the unset used
+        $this->tokens = array_values($this->tokens);
     }
     
     /**
@@ -179,11 +176,28 @@ class Tokens {
      */
     public function ptReadable() {
         $output = array();
-        foreach ($this->tokens as $val) {
-            if(is_array($val)) {
-                $output[] = $this->ft($val);
+        $counter = 0;
+        foreach ($this->tokens as $index => $token) {
+            
+            // If the token is an array
+            if (is_array($token)) {
+                
+                // if the token is a multidimensional array take care
+                $text = (isset($token[3])) ? $token[1].$token[3] : $token[1];
+                
+                // Remove whitespaces
+                $text = str_replace("\n", "", $text);
+                $text = str_replace("\n", "", $text);
+                
+                $output[$index]['value'] = token_name($token[0]);
+                $output[$index]['text'] = htmlentities($text);
+                $output[$index]['line'] = $token[2];
+            
+            // It's a ; or a .
             } else {
-                $output[] = $val;
+                $output[$index]['value'] = token_name(0);
+                $output[$index]['text'] = $token;
+                $output[$index]['line'] = '';
             }
         }
         return $output;
@@ -198,26 +212,6 @@ class Tokens {
      */
     public function pt() {
         echo "<pre>".print_r($this->tokens,1)."</pre>";
-    }
-    
-    
-    /**
-     * Format tokens.
-     * Utility function to be used while printing into a readable format.
-     */
-    public function ft($array) {
-        
-        // Convert tokens entities
-        if (isset($array[3]))
-            $string = htmlentities($array[1].$array[3]) ." - (". $array[0] .") ". token_name($array[0]) ." : $array[2]";
-        else
-            $string = htmlentities($array[1]) ." - (". $array[0] .") ". token_name($array[0]) ." : $array[2]";
-        
-        // Remove \n and \r chars
-        $string = str_replace("\n", "", $string);
-        $string = str_replace("\r", "", $string);
-        
-        return $string;
     }
     
     /**
