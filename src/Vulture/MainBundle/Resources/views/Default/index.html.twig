@@ -33,26 +33,49 @@
                         {% endfor %}
                     </ul>
                 
-            
-                <h3>Tokens:</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <td>Token code</td>
-                                <td>Token value</td>
-                                <td>Source line</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for token in tokens %}
+                    <div class="tokens-pre-execution">
+                        <h3>Tokens pre-execution:</h3>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td>{{ token['value'] }}</td>
-                                    <td>{{ token['text'] }}</td>
-                                    <td>{{ token['line'] }}</td>
+                                    <td>Token code</td>
+                                    <td>Token value</td>
+                                    <td>Source line</td>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {% for token in tokensPreExec %}
+                                    <tr>
+                                        <td>{{ token.value }}</td>
+                                        <td>{{ token.text }}</td>
+                                        <td>{{ token.line }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pvf">
+                        <h3>PVF found:</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td>Token code</td>
+                                    <td>Token value</td>
+                                    <td>Source line</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pvf in pvfs %}
+                                    <tr>
+                                        <td>{{ pvf.value }}</td>
+                                        <td>{{ pvf.text }}</td>
+                                        <td>{{ pvf.line }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                     
             {% endif %}

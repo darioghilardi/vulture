@@ -44,10 +44,12 @@ class Tokens {
         // Clean tokens
         $this->clean();
         
-        $this->pt();
+        //$this->pt();
         
         // Reconstruct arrays into one single token
-        $this->manageArrays();       
+        $this->manageArrays();
+        
+        //$this->pt();
         
         //$this->pat();
     }
@@ -71,23 +73,37 @@ class Tokens {
         $ntokens = count($this->tokens);
         
         for ($i = 0; $i < $ntokens; $i++) {
-            if( is_array($this->tokens[$i]) ) {
-                
-                // Mark for removal not needed token types received from the configuration class
-                if ( in_array($this->tokens[$i][0], $this->conf->ignore_tokens) ) {
-                    unset($this->tokens[$i]);
-                }
-                
-                // Launch additional cleaning from the securitylibs classes
-                $this->conf->additionalCleaning();           
-                
-            } else {        
-                
+            
+            // Transform every token into an array
+            if( !is_array($this->tokens[$i]) ) {
+                $this->uniform($i);
             }
+                
+            // Mark for removal not needed token types received from the configuration class
+            if ( in_array($this->tokens[$i][0], $this->conf->ignore_tokens) ) {
+                unset($this->tokens[$i]);
+            }
+                
+            // Launch additional cleaning from the securitylibs classes
+            $this->conf->additionalCleaning();
         }
         
         // Rearrange the array as some indexes have been removed
         $this->tokens = array_values($this->tokens);
+    }
+    
+    /**
+     * Uniform tokens.
+     * 
+     * Some tokens are arrays, some others are just strings. This function transforms
+     * everything into arrays, to avoid the continuous use of if cases in the code.
+     */
+    public function uniform($i) {
+        $this->tokens[$i] = array(
+            0 => 0,
+            1 => $this->tokens[$i],
+            2 => '',
+        );
     }
     
     /**
@@ -112,7 +128,7 @@ class Tokens {
             if (
                 (isset($this->tokens[$i][0])) &&
                 ($this->tokens[$i][0] == T_VARIABLE) &&
-                ($this->tokens[$i+1] == '[')
+                ($this->tokens[$i+1][1] == '[')
                ) {
                 
                 // Setup indexes to cycle through array elements
@@ -130,23 +146,19 @@ class Tokens {
                     
                     // Save into the tokens array the string representation of 
                     // the full array
-                    if (is_array($this->tokens[$arrayNavigator])) {
-                        $this->tokens[$multidimArrayIndex][3] .= $this->tokens[$arrayNavigator][1];
-                    } else {
-                        $this->tokens[$multidimArrayIndex][3] .= $this->tokens[$arrayNavigator];
-                    }
+                    $this->tokens[$multidimArrayIndex][3] .= $this->tokens[$arrayNavigator][1];                    
                     
                     // Count brackets, needed to decide when to stop the loop
-                    if ($this->tokens[$arrayNavigator] == '[')
+                    if ($this->tokens[$arrayNavigator][1] == '[')
                         $brackets++;
-                    elseif ($this->tokens[$arrayNavigator] == ']')
+                    elseif ($this->tokens[$arrayNavigator][1] == ']')
                         $brackets--;
                     
                     // remove 
                     unset($this->tokens[$arrayNavigator]);
                     
                     // Next array element
-                    $arrayNavigator++; 
+                    $arrayNavigator++;
                     
                     // Exit from the loop when:
                     // - there're no more tokens into $this->tokens
@@ -154,7 +166,7 @@ class Tokens {
                     // The break statement is used instead of complicated 
                     // conditions into the while statement
                     if ( (!isset($this->tokens[$arrayNavigator])) || 
-                         ($this->tokens[$arrayNavigator] != '[') && ($brackets == 0))
+                         ($this->tokens[$arrayNavigator][1] != '[') && ($brackets == 0))
                         break;
                 }                
                 
@@ -175,30 +187,22 @@ class Tokens {
      * A foreach needs to be added to print multidimensional arrays on index [3].
      */
     public function ptReadable() {
+        // Initialize the output array
         $output = array();
-        $counter = 0;
-        foreach ($this->tokens as $index => $token) {
+        
+        foreach ($this->tokens as $index => $token) {        
+                
+            // if the token is a multidimensional array take care
+            $text = (isset($token[3])) ? $token[1].$token[3] : $token[1];
+
+            // Remove whitespaces
+            $text = str_replace("\n", "", $text);
+            $text = str_replace("\n", "", $text);
+
+            $output[$index]['value'] = token_name($token[0]);
+            $output[$index]['text'] = htmlentities($text);
+            $output[$index]['line'] = $token[2];
             
-            // If the token is an array
-            if (is_array($token)) {
-                
-                // if the token is a multidimensional array take care
-                $text = (isset($token[3])) ? $token[1].$token[3] : $token[1];
-                
-                // Remove whitespaces
-                $text = str_replace("\n", "", $text);
-                $text = str_replace("\n", "", $text);
-                
-                $output[$index]['value'] = token_name($token[0]);
-                $output[$index]['text'] = htmlentities($text);
-                $output[$index]['line'] = $token[2];
-            
-            // It's a ; or a .
-            } else {
-                $output[$index]['value'] = token_name(0);
-                $output[$index]['text'] = $token;
-                $output[$index]['line'] = '';
-            }
         }
         return $output;
     }

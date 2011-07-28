@@ -39,7 +39,7 @@ class DefaultController extends Controller
                     $tokenized->build();
                     
                     //$tokenized->pt();
-                    $output = $tokenized->ptReadable();
+                    $tokensPreExec = $tokenized->ptReadable();
                     //echo "<pre>".print_r($output,1)."</pre>";
                     
                     // Execute the processing
@@ -49,10 +49,10 @@ class DefaultController extends Controller
                 
                 // Output the results                
                 return $this->render('VultureMainBundle:Default:index.html.twig', array(
-                    'results'   => true,
-                    'files'     => $scan->files,
-                    'tokens'    => $output,
-                    'helptext'  => false,
+                    'results'           => true,
+                    'files'             => $scan->files,
+                    'tokensPreExec'     => $tokensPreExec,
+                    'pvfs'              => $process->ptReadable(),
                 ));
                 
                 //return $this->redirect($this->generateUrl('VultureMainBundle_results'));

@@ -33,13 +33,12 @@ class Processor {
      */
     public function launch() {
         
-        for ($i = count($this->tokens) -1 ; $i > 0; $i--) {
+        $lastElement = count($this->tokens) - 1;
+        for ($i = $lastElement; $i >= 0; $i--) {
             
             // Detect variables
             $this->printDetect($i);
         }
-        
-        print_r($this->pvf);
     }
     
     /**
@@ -50,19 +49,51 @@ class Processor {
         // If a print or echo statements are found
         if ( ($this->tokens[$i][0] == T_ECHO) || ($this->tokens[$i][0] == T_PRINT) ) {
             
-            echo "cioap";
+            // Start a loop from the element following the print/echo to find 
+            // printed variables
+            $k = $i + 1;
             
-            // Start a loop from this element to find what has been printed until ;
-            $k = $i;
-            /*while ($this->tokens[$k][1] == ';') {
+            while ($this->tokens[$k][1] != ';') {
                 
-                // Save the printed elements into the pvf array
-                $this->pvf[] = $this->tokens[$k];
+                // If the current token is a variable
+                if ($this->tokens[$k][0] == T_VARIABLE) {
+                    
+                    // Save the printed element into the pvf array
+                    $this->pvf[] = $this->tokens[$k];
+                }
                 
                 // Move index to the next element
                 $k++;
-            }*/
+            }
         }
+    }
+    
+    /**
+     * Print tokens into a readable format. Useful to show the tokens but it's
+     * important to know that indexes are reformatted during the printing process.
+     * 
+     * The method print the tokens into a readable format.
+     * A foreach needs to be added to print multidimensional arrays on index [3].
+     */
+    public function ptReadable() {
+        // Initialize the output array
+        $output = array();
+        
+        foreach ($this->pvf as $index => $token) {        
+                
+            // if the token is a multidimensional array take care
+            $text = (isset($token[3])) ? $token[1].$token[3] : $token[1];
+
+            // Remove whitespaces
+            $text = str_replace("\n", "", $text);
+            $text = str_replace("\n", "", $text);
+
+            $output[$index]['value'] = token_name($token[0]);
+            $output[$index]['text'] = htmlentities($text);
+            $output[$index]['line'] = $token[2];
+            
+        }
+        return $output;
     }
 }
 
