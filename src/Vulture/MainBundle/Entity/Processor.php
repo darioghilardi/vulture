@@ -34,6 +34,7 @@ class Processor {
     public function launch() {
         
         $lastElement = count($this->tokens) - 1;
+        
         for ($i = $lastElement; $i >= 0; $i--) {
             
             // Detect variables
@@ -66,6 +67,31 @@ class Processor {
                 $k++;
             }
         }
+    }
+    
+    /**
+     * Check if a variable has been sanitized. If so, the variable will be removed
+     * from the pvf array.
+     */
+    public function checkSanitization($i) {
+        $functions  = $this->conf->securing;
+        
+        if (in_array($this->tokens[$i][1], $functions)) {
+            
+            // The configuration class provides me a way to at what place there's the token
+        }
+    }
+    
+    /**
+     * Check if a variable content is re-assigned.
+     * This is useful to understand because sanitization could be compromised.
+     */
+    public function checkReassignment($i) {
+        /*$functions  = $this->conf->securing;
+        
+        if (in_array($this->tokens[$i][1], $functions)) {
+            
+        }*/
     }
     
     /**

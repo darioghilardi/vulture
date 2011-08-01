@@ -35,12 +35,13 @@ class HttpParameterPollution {
         'echo',
 		'print',
 		'printf',
+        'print_r',
 		'vprintf',
     );
     
     public $securing = array(
-        'htmlentities',
-		'htmlspecialchars'
+        'htmlentities'      => array(1),
+		'htmlspecialchars'  => array(1),
     );
     
     public $ignore_tokens = array (
